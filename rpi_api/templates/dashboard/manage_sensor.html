@@ -1,0 +1,138 @@
+{% extends "dashboard/base.html" %}
+{% load static %}
+{% block content %}
+
+<div class="max-w-4xl border rounded p-4 bg-white mx-auto">
+    <h3 class="text-lg">{{sensor.name}}</h3>
+    <form method="post">
+        {% csrf_token %}
+        <div class="mt-4">
+            {{form}}
+        </div>
+        <div class="mt-4 flex items-center space-x-4">
+            <button type="submit" class="px-4 py-1 rounded bg-indigo-600 text-white hover:bg-indigo-700 ease duration-200">Save</button>
+            {% if messages %}
+                {% for message in messages %}
+                    {% if message.tags == 'success' %}
+                        <p class="text-green-500">{{message}}</p>
+                    {% else %}
+                        <p class="text-red-500">{{message}}</p>
+                    {% endif %}
+                {% endfor %}
+            {% endif %}
+        </div>
+    </form>
+</div>
+<div class="container mx-auto mt-4">
+    {% if sensor_type == 'temperature' %}
+    <div class="w-full border rounded bg-white max-h-96 overflow-y-auto">
+        <div class="w-full p-2 border-b bg-gray-50 flex items-center justify-between">
+            <h4 class="text-gray-500 font-medium text-sm">Temperatures</h4>
+            <a href="{% url 'export_temperatures' %}" class="px-4 py-1 rounded bg-indigo-600 hover:bg-indigo-700 ease duration-200 text-white text-sm">Export</a>
+        </div>
+        <table class="w-full">
+            <thead>
+                <tr>
+                    <th class="font-medium text-sm text-gray-500">Celsius</th>
+                    <th class="font-medium text-sm text-gray-500">Fahrenheit</th>
+                    <th class="font-medium text-sm text-gray-500">Timestamp</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% if logs|length > 0 %}
+                    {% for temperature in logs %}
+                    <tr class="text-center">
+                        <td class="py-2 border-t">{{ temperature.temperature }} C</td>
+                        <td class="py-2 border-t">{{ temperature.fahrenheit }} F</td>
+                        <td class="py-2 border-t">{{ temperature.timestamp }}</td>
+                    </tr>
+                    {% endfor %}
+                {% else %}
+                    <tr>
+                        <td class="py-2 text-gray-600 border-t text-center" colspan="4">No captures available.</td>
+                    </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+    {%  elif sensor_type == 'motion' %}
+    <div class="w-full border rounded bg-white max-h-96 overflow-y-auto">
+        <div class="w-full p-2 border-b bg-gray-50 flex items-center justify-between">
+            <h4 class="text-gray-500 font-medium text-sm">Captures</h4>
+            <a href="{% url 'export_images' %}" class="px-4 py-1 rounded bg-indigo-600 hover:bg-indigo-700 ease duration-200 text-white text-sm">Export</a>
+        </div>
+        <table class="w-full">
+            <thead>
+                <tr>
+                    <th class="font-medium text-sm text-gray-500">Processing Time</th>
+                    <th class="font-medium text-sm text-gray-500">Detected Human/s</th>
+                    <th class="font-medium text-sm text-gray-500">Timestamp</th>
+                    <th class="font-medium text-sm text-gray-500">Filename</th>
+                    <th class="font-medium text-sm text-gray-500">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% if logs|length > 0 %}
+                    {% for image in logs %}
+                    <tr class="text-center">
+                        <td class="py-2 border-t">{{ image.rounded_processing_time }} Seconds</td>
+                        <td class="py-2 border-t">{{ image.detected_humans }}</td>
+                        <td class="py-2 border-t">{{ image.timestamp }}</td>
+                        <td class="py-2 border-t">{{ image.shortened_image_name }}</td>
+                        <td class="py-2 border-t">
+                            <a href="/{{ image.image_name }}" class="text-indigo-500 underline">View Image</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                {% else %}
+                    <tr>
+                        <td class="py-2 text-gray-600 border-t text-center" colspan="4">No captures available.</td>
+                    </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+    {% elif sensor_type == 'meter' %}
+    <div class="w-full border rounded bg-white max-h-96 overflow-y-auto">
+        <div class="w-full p-2 border-b bg-gray-50 flex items-center justify-between">
+            <h4 class="text-gray-500 font-medium text-sm">Power Meter</h4>
+            <a href="{% url 'export_meter' %}" class="px-4 py-1 rounded bg-indigo-600 hover:bg-indigo-700 ease duration-200 text-white text-sm">Export</a>
+        </div>
+        <table class="w-full">
+            <thead>
+                <tr>
+                    <th class="font-medium text-sm text-gray-500">Voltage</th>
+                    <th class="font-medium text-sm text-gray-500">Current</th>
+                    <th class="font-medium text-sm text-gray-500">Power</th>
+                    <th class="font-medium text-sm text-gray-500">Energy</th>
+                    <th class="font-medium text-sm text-gray-500">Frequency</th>
+                    <th class="font-medium text-sm text-gray-500">Power Factor</th>
+                    <th class="font-medium text-sm text-gray-500">Timestamp</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% if logs|length > 0 %}
+                    {% for reading in logs %}
+                    <tr class="text-center">
+                        <td class="py-2 border-t">{{reading.voltage}}V</td>
+                        <td class="py-2 border-t">{{reading.current}}A</td>
+                        <td class="py-2 border-t">{{reading.power}}W</td>
+                        <td class="py-2 border-t">{{reading.energy}}kWh</td>
+                        <td class="py-2 border-t">{{reading.frequency}}Hz</td>
+                        <td class="py-2 border-t">{{reading.power_factor}}</td>
+                        <td class="py-2 border-t">{{reading.timestamp}}</td>
+                    </tr>
+                    {% endfor %}
+                {% else %}
+                    <tr>
+                        <td class="py-2 text-gray-600 border-t text-center" colspan="4">No power meter data available.</td>
+                    </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+    {% endif %}
+</div>
+
+
+{% endblock %}

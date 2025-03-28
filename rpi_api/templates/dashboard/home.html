@@ -1,0 +1,192 @@
+{% extends "dashboard/base.html" %}
+{% load static %}
+{% block content %}
+
+
+<div class="grid md:grid-cols-2 grid-cols-1 gap-4">
+    <div class="w-full border rounded bg-white max-h-96 overflow-y-auto">
+        <div class="w-full p-2 border-b bg-gray-50">
+            <h4 class="text-gray-500 font-medium text-sm">Registered Devices</h4>
+        </div>
+        <table class="w-full">
+            <thead>
+                <tr>
+                    <th class="font-medium text-sm text-gray-500">Name</th>
+                    <th class="font-medium text-sm text-gray-500">Battery Level</th>
+                    <th class="font-medium text-sm text-gray-500">Delay</th>
+                    <th class="font-medium text-sm text-gray-500">Last Seen</th>
+                    <th class="font-medium text-sm text-gray-500">Type</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% if registered_sensors|length > 0 %}
+                    {% for sensor in registered_sensors %}
+                    <tr class="text-center">
+                        <td class="py-2 border-t">
+                            <a href="{% url 'manage_sensor' sensor.name %}" class="underline text-blue-600">{{sensor.name}}</a>
+                        </td>
+                        <td class="py-2 border-t">{{ sensor.battery_level }}%</td>
+                        <td class="py-2 border-t">{{ sensor.delay_in_seconds }} secs</td>
+                        <td class="py-2 border-t">{{ sensor.last_seen }}</td>
+                        <td class="py-2 border-t">{{ sensor.sensor_type }}</td>
+                    </tr>
+                    {% endfor %}
+                {% else %}
+                    <tr>
+                        <td class="py-2 text-gray-600 border-t text-center" colspan="4">No Sensors available.</td>
+                    </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="w-full border rounded bg-white max-h-96 overflow-y-auto">
+        <div class="w-full p-2 border-b bg-gray-50">
+            <h4 class="text-gray-500 font-medium text-sm">Temperatures</h4>
+        </div>
+        <table class="w-full">
+            <thead>
+                <tr>
+                    <th class="font-medium text-sm text-gray-500">Celsius</th>
+                    <th class="font-medium text-sm text-gray-500">Fahrenheit</th>
+                    <th class="font-medium text-sm text-gray-500">Timestamp</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% if temperatures|length > 0 %}
+                    {% for temperature in temperatures %}
+                    <tr class="text-center">
+                        <td class="py-2 border-t">{{ temperature.temperature }} C</td>
+                        <td class="py-2 border-t">{{ temperature.fahrenheit }} F</td>
+                        <td class="py-2 border-t">{{ temperature.timestamp }}</td>
+                    </tr>
+                    {% endfor %}
+                {% else %}
+                    <tr>
+                        <td class="py-2 text-gray-600 border-t text-center" colspan="4">No captures available.</td>
+                    </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+
+    
+</div>
+
+<div class="w-full border rounded bg-white max-h-96 overflow-y-auto mt-4">
+    <div class="w-full p-2 border-b bg-gray-50">
+        <h4 class="text-gray-500 font-medium text-sm">Captures</h4>
+    </div>
+    <table class="w-full">
+        <thead>
+            <tr>
+                <th class="font-medium text-sm text-gray-500">Processing Time</th>
+                <th class="font-medium text-sm text-gray-500">Detected Human/s</th>
+                <th class="font-medium text-sm text-gray-500">Timestamp</th>
+                <th class="font-medium text-sm text-gray-500">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% if images|length > 0 %}
+                {% for image in images %}
+                <tr class="text-center">
+                    <td class="py-2 border-t">{{ image.rounded_processing_time }} Seconds</td>
+                    <td class="py-2 border-t">{{ image.detected_humans }}</td>
+                    <td class="py-2 border-t">{{ image.timestamp }}</td>
+                    <td class="py-2 border-t">
+                        <a href="/{{ image.image_name }}" class="text-indigo-500 underline">View Image</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            {% else %}
+                <tr>
+                    <td class="py-2 text-gray-600 border-t text-center" colspan="4">No captures available.</td>
+                </tr>
+            {% endif %}
+        </tbody>
+    </table>
+</div>
+
+<div class="w-full border rounded bg-white max-h-96 overflow-y-auto mt-4">
+    <div class="w-full p-2 border-b bg-gray-50">
+        <h4 class="text-gray-500 font-medium text-sm">Power Meter</h4>
+    </div>
+    <table class="w-full">
+        <thead>
+            <tr>
+                <th class="font-medium text-sm text-gray-500">Voltage</th>
+                <th class="font-medium text-sm text-gray-500">Current</th>
+                <th class="font-medium text-sm text-gray-500">Power</th>
+                <th class="font-medium text-sm text-gray-500">Energy</th>
+                <th class="font-medium text-sm text-gray-500">Frequency</th>
+                <th class="font-medium text-sm text-gray-500">Power Factor</th>
+                <th class="font-medium text-sm text-gray-500">Timestamp</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% if power_meter|length > 0 %}
+                {% for reading in power_meter %}
+                <tr class="text-center">
+                    <td class="py-2 border-t">{{reading.voltage}}V</td>
+                    <td class="py-2 border-t">{{reading.current}}A</td>
+                    <td class="py-2 border-t">{{reading.power}}W</td>
+                    <td class="py-2 border-t">{{reading.energy}}kWh</td>
+                    <td class="py-2 border-t">{{reading.frequency}}Hz</td>
+                    <td class="py-2 border-t">{{reading.power_factor}}</td>
+                    <td class="py-2 border-t">{{reading.timestamp}}</td>
+                </tr>
+                {% endfor %}
+            {% else %}
+                <tr>
+                    <td class="py-2 text-gray-600 border-t text-center" colspan="4">No power meter data available.</td>
+                </tr>
+            {% endif %}
+        </tbody>
+    </table>
+</div>
+
+<div class="grid md:grid-cols-2 grid-cols-1 mt-4 gap-4">
+    <div class="col-span-2 w-full border rounded bg-white max-h-96 overflow-y-auto">
+        <div class="w-full p-2 border-b bg-gray-50">
+            <h4 class="text-gray-500 font-medium text-sm">Logs</h4>
+        </div>
+        <table class="w-full">
+            <thead>
+                <tr>
+                    <th class="font-medium text-left p-2 text-sm text-gray-500">Type</th>
+                    <th class="font-medium text-left p-2 text-sm text-gray-500">Message</th>
+                    <th class="font-medium text-left p-2 text-sm text-gray-500">Timestamp</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% if logs|length > 0 %}
+                    {% for log in logs %}
+                    <tr class="text-center">
+                        <td class="py-2 border-t text-left px-2">
+                            {% if log.severity == 'INFO' %}
+                                <span class="bg-blue-600 rounded px-2 py-1 text-white text-xs">INFO</span>
+                            {% elif log.severity == 'SUCCESS' %}
+                                <span class="bg-green-600 rounded px-2 py-1 text-white text-xs">SUCCESS</span>
+                            {% elif log.severity == 'WARNING' %}
+                                <span class="bg-yellow-600 rounded px-2 py-1 text-white text-xs">WARNING</span>
+                            {% elif log.severity == 'ERROR' %}
+                                <span class="bg-red-600 rounded px-2 py-1 text-white text-xs">ERROR</span>
+                            {% endif %}
+    
+                        </td>
+                        <td class="py-2 border-t text-left">{{ log.message }}</td>
+                        <td class="py-2 border-t text-left">{{ log.timestamp }}</td>
+                    </tr>
+                    {% endfor %}
+                {% else %}
+                    <tr>
+                        <td class="py-2 text-gray-600 border-t text-center" colspan="3">No logs available.</td>
+                    </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+
+{% endblock %}

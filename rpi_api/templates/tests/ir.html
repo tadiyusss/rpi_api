@@ -1,0 +1,29 @@
+{% load static %}
+<!doctype html>
+<html lang='en'>
+    <head>
+        <meta charset='utf-8'>
+        <meta name='viewport' content='width=device-width, initial-scale=1'>
+        <title>IR Remote Test</title>
+        <script src='{% static "js/tailwind.js" %}'></script>
+    </head>
+    <body>
+        <div class="max-w-3xl mx-auto my-4 md:px-0 px-4">
+            <h4 class="text-center text-lg font-medium mb-10">IR Remote Test</h4>
+                {% if status == 'error' %}
+                    <div class="my-4 bg-red-600 text-white border border-red-700 p-2 rounded">
+                        <p class="">{{ message }}</p>
+                    </div>
+                {% elif status == 'success' %}
+                <div class="my-4 bg-green-600 text-white border border-green-700 p-2 rounded">
+                    <p class="">{{ message }}</p>
+                </div>
+                {% endif %}
+                <div class="flex items-center justify-between">
+                    <a href="" class="px-4 py-1 text-white text-sm rounded bg-indigo-600 hover:bg-indigo-700 ease duration-200">Retry</a>
+                    <a href="{% url 'dashboard' %}" class="px-4 py-1 text-white text-sm rounded bg-gray-600 hover:bg-gray-700 ease duration-200">Return to Dashboard</a>
+                </div>
+            </form>
+        </div>
+    </body>
+</html>

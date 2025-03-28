@@ -1,0 +1,59 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<title>Dashboard</title>
+		<script src="{% static 'js/tailwind.js' %}"></script>
+	</head>
+	<body class="font-instrument bg-gray-50">
+		<div class="flex min-h-screen h-full">
+			<div id="overlay" class="fixed inset-0 bg-black bg-opacity-50 hidden z-20 lg:hidden"></div>
+
+			<div id="sidebar" class="fixed inset-y-0 left-0 z-30 w-72 bg-white border-r transform -translate-x-full transition-transform duration-300 lg:translate-x-0 lg:static">
+				<div class="flex items-center p-4 space-x-4">
+					<h2 class="text-xl font-bold">Raspberry Pi API</h2>
+				</div>
+				<nav class="mt-6">
+                    <ul class="mx-4">
+                        <li class="px-4 py-2 my-1 rounded-lg text-gray-500 hover:text-gray-800 hover:bg-gray-100 ease duration-200">
+                            <a href="{% url 'dashboard' %}" class="flex items-center space-x-4">
+                                <p class="font-medium">Home</p>
+                            </a>
+                        </li>
+
+						<li class="px-4 py-2 my-1 rounded-lg text-gray-500 hover:text-gray-800 hover:bg-gray-100 ease duration-200">
+                            <a href="{% url 'settings' %}" class="flex items-center space-x-4">
+                                <p class="font-medium">Settings</p>
+                            </a>
+                        </li>
+
+                        <li class="px-4 py-2 my-1 rounded-lg text-gray-500 hover:text-gray-800 hover:bg-gray-100 ease duration-200">
+                            <a href="{% url 'logout' %}" class="flex items-center space-x-4">
+                                <p class="font-medium">Logout</p>
+                            </a>
+                        </li>
+                        
+                    </ul>
+				</nav>
+			</div>
+			<!-- Main Content -->
+			<div class="flex-1">
+				<header class="flex p-4 border-b lg:space-x-0 space-x-4 bg-white">
+					<button id="openSidebar" class="text-gray-500 hover:text-gray-800 lg:hidden">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+                        </svg>                          
+                    </button>
+                    <h4 class="text-xl font-medium">Hello, {{ request.user.username }}</h4>
+				</header>
+				<main class="p-4">
+                    {% block content %}{% endblock %}
+				</main>
+			</div>
+		</div>
+    
+        {% block javascript %}{% endblock %}
+	</body>
+</html>

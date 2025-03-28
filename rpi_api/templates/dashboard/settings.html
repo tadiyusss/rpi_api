@@ -1,0 +1,24 @@
+{% extends "dashboard/base.html" %}
+{% block content %}
+    <div class="max-w-4xl mx-auto border rounded p-4 bg-white">
+        <div class="w-full mb-4">
+            <h4 class="font-medium text-lg">Tests</h4>
+            <div class="mt-4">
+                <ul class="space-y-4">
+                    <li class="flex items-center space-x-4">
+                        <p>Camera</p>
+                        <a href="{% url 'test_camera' %}" class="px-4 py-1 text-sm rounded bg-indigo-600 text-white hover:bg-indigo-700 ease duration-200">Test</a>
+                    </li>
+                    <li class="flex items-center space-x-4">
+                        <p>IR Remote</p>
+                        <div class="flex flex-wrap gap-2">
+                            {% for btn in ir_buttons %}
+                                <a href="{% url 'test_ir' btn %}" class="px-4 py-1 text-sm rounded bg-indigo-600 text-white hover:bg-indigo-700 ease duration-200">{{btn}}</a>
+                            {% endfor %}
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+{% endblock %}

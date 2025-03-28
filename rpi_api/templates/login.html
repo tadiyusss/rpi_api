@@ -1,0 +1,39 @@
+{% load static %}
+<!doctype html>
+<html lang='en'>
+    <head>
+        <meta charset='utf-8'>
+        <meta name='viewport' content='width=device-width, initial-scale=1'>
+        <title>Raspberry Pi API Dashboard - Login</title>
+        <script src="{% static 'js/tailwind.js' %}"></script>   
+    </head>
+    <body class="bg-gray-50">
+        <div class="max-w-lg mx-auto md:my-24 mt-14 px-4">
+            <div class="mt-10">
+                <div class="flex items-center space-x-4">
+                    <h4 class="font-semibold text-2xl">Raspberry Pi API</h4>
+                </div>
+                <p class="text-gray-500 mt-1">Enter your login credentials to access the dashboard.</p>
+            </div>
+            <form method="POST">                
+                    {% csrf_token %}
+                    {% for field in form %}
+                        <div class="mt-4">
+                            <label for="{{ field.id_for_label }}" class="font-medium text-gray-600 text-sm">{{ field.label }}</label>
+                            {{ field }}
+                        </div>
+                    {% endfor %}
+                    {% if messages %}
+                        {% for message in messages %}
+                            <div class="mt-4 bg-red-600 p-2 text-white rounded">
+                                <p class="text-sm">{{ message }}</p>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                <div class="mt-4">
+                    <button class="w-full text-white font-medium py-2 rounded bg-indigo-500 hover:bg-indigo-600 ease duration-200 focus:outline-indigo-500">Login</button>
+                </div>
+            </form>
+        </div>
+    </body>
+</html>

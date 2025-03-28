@@ -1,0 +1,32 @@
+{% load static %}
+<!doctype html>
+<html lang='en'>
+    <head>
+        <meta charset='utf-8'>
+        <meta name='viewport' content='width=device-width, initial-scale=1'>
+        <title>Camera Test</title>
+        <script src='{% static "js/tailwind.js" %}'></script>
+    </head>
+    <body>
+        <div class="max-w-3xl mx-auto my-4 md:px-0 px-4">
+            <h4 class="text-center text-lg font-medium mb-10">Camera Test</h4>
+            {% if image %}
+                <img src="/{{ image }}" class="mx-auto h-96">
+            {% endif %}
+            {% if status == 'error' %}
+            <div class="w-full bg-red-300 border border-red-400 p-2 rounded mb-4">
+                <p class="text-red-800">{{ message }}</p>
+            </div>
+            {% elif status == 'success' %}
+            <div class="w-full bg-green-300 border border-green-400 p-2 rounded my-4">
+                <p class="text-green-800">{{ message }}</p>
+                <div class="mt-2">
+                    <p>Human Count: {{data.human_count}}</p>
+                    <p>Processing Time: {{ data.processing_time }} ms</p>
+                </div>
+            </div>
+            {% endif %}
+            <a href="{% url 'dashboard' %}" class="px-4 py-1 text-white text-sm rounded bg-indigo-600 hover:bg-indigo-700 ease duration-200">Return to Dashboard</a>
+        </div>
+    </body>
+</html>
