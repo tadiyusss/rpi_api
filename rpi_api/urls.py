@@ -20,6 +20,8 @@ from rpi_api.views import esp82
 from rpi_api.views import dashboard
 from django.urls import include
 from rpi_api.views import test as test_views
+from django.conf import settings
+from django.conf.urls.static import static
 
 esp_patterns = [
     path('motion/', esp82.receive_motion),
@@ -28,7 +30,7 @@ esp_patterns = [
     path('initial/', esp82.initial_connection),
     path('ir/', esp82.send_ir_data),
     path('led/', esp82.send_led_signal),
-]
+] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
 test_patterns = [
     path('camera/', test_views.test_camera, name = 'test_camera'),

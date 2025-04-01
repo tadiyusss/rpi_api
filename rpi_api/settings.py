@@ -27,6 +27,12 @@ DEBUG = True
 
 ALLOWED_HOSTS = ["*"]
 
+CSRF_TRUSTED_ORIGINS = [
+    'http://0.0.0.0:8000',
+    'http://192.168.254.32:8000',
+    'http://10.3.141.1:8000',
+    'http://localhost:8000'
+]
 
 # Application definition
 
@@ -121,7 +127,7 @@ STATICFILES_DIRS = [
     BASE_DIR / "static",  # Ensure you have a "static/" folder at project root
 ]
 
-STATIC_ROOT = BASE_DIR / "staticfiles"
+STATIC_ROOT = BASE_DIR / "static_files"
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
