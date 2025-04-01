@@ -16,6 +16,9 @@ from utils.camera import capture_and_detect_humans
 from django.utils import timezone
 from utils.ir import IR
 
+led_delay_start = None
+led_light = True
+
 @csrf_exempt
 def initial_connection(request):
     """
@@ -267,19 +270,29 @@ def receive_motion(request):
     latest_temperature = Temperature.objects.all().order_by('-timestamp').first()
     last_ir_send = IRSend.objects.all().order_by('-timestamp').first()
 
-    if detection_result['data']['human_count'] < 10:
+    if detection_result['data']['human_count'] == 0:
+        if led_delay_start is None:
+            led_delay_start = timezone.now()
+        elif (timezone.now() - led_delay_start).total_seconds() > 5:
+            led_delay_start = None
+            ir_send = IRSend(name='SET_25')
+            ir_send.save()
+            led_light = False
+    elif detection_result['data']['human_count'] < 10:
         if latest_temperature.temperature > 25.0 and last_ir_send.name != 'SET_25':
             ir_send = IRSend(name='SET_25')
             ir_send.save()
+            led_light = True
     elif detection_result['data']['human_count'] < 20 and last_ir_send.name != 'SET_22':
         if latest_temperature.temperature > 22.0:
             ir_send = IRSend(name='SET_22')
             ir_send.save()
+            led_light = True
     elif detection_result['data']['human_count'] >= 20 and last_ir_send.name != 'SET_19':
         if latest_temperature.temperature > 19.0:
             ir_send = IRSend(name='SET_19')
             ir_send.save()
-
+            led_light = True
     return HttpResponse(f"success|Motion data received|{sensor.delay}")
 
 
@@ -331,3 +344,48 @@ def send_ir_data(request):
     log = Logs(severity='SUCCESS', message=f'Sent IR data to {name}')
     log.save()
     return HttpResponse(f"success|{ir_data.name}|{sensor.delay}")
+
+
+@csrf_exempt
+def send_led_signal(request):
+    """
+    This view is used to send LED signal to ESP8266.
+    """
+
+    if request.method != 'POST':
+        log = Logs(severity='WARNING', message='Invalid request method from LED Sender')
+        log.save()
+        return JsonResponse({
+            'status': 'error',
+            'message': 'Invalid request method',
+            'data': ''
+        }, status=405)
+    
+    battery_level = request.POST.get('battery_level', None)
+    name = request.POST.get('name', None)
+
+    if name is None:
+        log = Logs(severity='ERROR', message='Sensor name not found')
+        log.save()
+        return HttpResponse(f"error|Sensor name not found|", 400)
+    
+    if battery_level is None:
+        log = Logs(severity='ERROR', message='Battery level not found')
+        log.save()
+        return HttpResponse(f"error|Battery level not found|", 400)
+    
+    sensor = RegisteredSensor.objects.get(name=name)
+
+    if sensor is None:
+        log = Logs(severity='ERROR', message='Sensor not registered')
+        log.save()
+        return HttpResponse(f"error|Sensor not registered|", 400)
+    
+    sensor.battery_level = battery_level
+    sensor.last_seen = timezone.now()
+    sensor.save()
+
+    if led_light == True:
+        return HttpResponse(f"success|HIGH|{sensor.delay}")
+    else:
+        return HttpResponse(f"success|LOW|{sensor.delay}")

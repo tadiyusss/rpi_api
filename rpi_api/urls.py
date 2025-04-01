@@ -27,6 +27,7 @@ esp_patterns = [
     path('meter/', esp82.receive_power),
     path('initial/', esp82.initial_connection),
     path('ir/', esp82.send_ir_data),
+    path('led/', esp82.send_led_signal),
 ]
 
 test_patterns = [
