@@ -403,7 +403,7 @@ def send_led_signal(request):
     if image_data is None:
         return HttpResponse(f"error|No image data available|{sensor.delay}", 400)
     
-    if (timezone.now() - image_data.timestamp).total_seconds() > 300:
+    if (timezone.now() - image_data.timestamp).total_seconds() > 1200:
         return HttpResponse(f"error|LOW|{sensor.delay}", 400)
     
     if image_data.detected_humans <= 0:
