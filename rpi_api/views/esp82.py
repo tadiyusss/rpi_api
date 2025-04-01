@@ -291,22 +291,18 @@ def receive_motion(request):
             led_delay_start = None
             ir_send = IRSend(name='SET_25')
             ir_send.save()
-            led_light = False
     elif detection_result['data']['human_count'] < 10:
         if latest_temperature.temperature > 25.0 and last_ir_send.name != 'SET_25':
             ir_send = IRSend(name='SET_25')
             ir_send.save()
-            led_light = True
     elif detection_result['data']['human_count'] < 20 and last_ir_send.name != 'SET_22':
         if latest_temperature.temperature > 22.0:
             ir_send = IRSend(name='SET_22')
             ir_send.save()
-            led_light = True
     elif detection_result['data']['human_count'] >= 20 and last_ir_send.name != 'SET_19':
         if latest_temperature.temperature > 19.0:
             ir_send = IRSend(name='SET_19')
             ir_send.save()
-            led_light = True
     return HttpResponse(f"success|Motion data received|{sensor.delay}")
 
 
@@ -403,12 +399,14 @@ def send_led_signal(request):
     sensor.last_seen = timezone.now()
     sensor.save()
 
-    if led_light != None:
-        if led_light == True:
-            led_light = None
-            return HttpResponse(f"success|HIGH|{sensor.delay}")
-        else:
-            led_light = None
-            return HttpResponse(f"success|LOW|{sensor.delay}")
-    else:
-        return HttpResponse(f"error|No LED data available|{sensor.delay}", 400)
+    image_data = Image.objects.all().order_by('-timestamp').first()
+    if image_data is None:
+        return HttpResponse(f"error|No image data available|{sensor.delay}", 400)
+    
+    if (timezone.now() - image_data.timestamp).total_seconds() > 300:
+        return HttpResponse(f"error|LOW|{sensor.delay}", 400)
+    
+    if image_data.detected_humans < 1:
+        return HttpResponse(f"error|LOW|{sensor.delay}", 400)
+    
+    return HttpResponse(f"success|HIGH|{sensor.delay}")
