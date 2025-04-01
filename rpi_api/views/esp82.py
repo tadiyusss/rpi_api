@@ -17,7 +17,7 @@ from django.utils import timezone
 from utils.ir import IR
 
 led_delay_start = None
-led_light = True
+led_light = None
 
 @csrf_exempt
 def initial_connection(request):
@@ -385,7 +385,10 @@ def send_led_signal(request):
     sensor.last_seen = timezone.now()
     sensor.save()
 
-    if led_light == True:
-        return HttpResponse(f"success|HIGH|{sensor.delay}")
+    if led_light != None:
+        if led_light == True:
+            return HttpResponse(f"success|HIGH|{sensor.delay}")
+        else:
+            return HttpResponse(f"success|LOW|{sensor.delay}")
     else:
-        return HttpResponse(f"success|LOW|{sensor.delay}")
+        return HttpResponse(f"error|No LED data available|{sensor.delay}", 400)
