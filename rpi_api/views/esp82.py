@@ -1,9 +1,4 @@
 """
-Notes:
-
-This views only accept POST requests from User-Agent: ESP8266HTTPClient
-
-
 Response format:
 - success|<message>|<delay in milliseconds>
 - error|<message>|<delay in milliseconds>
@@ -16,6 +11,8 @@ from utils.camera import capture_and_detect_humans
 from django.utils import timezone
 from utils.ir import IR
 
+
+last_motion_detected = None
 led_delay_start = None
 led_light = None
 
@@ -227,6 +224,7 @@ def receive_motion(request):
 
     name = request.POST.get('name', None)
     battery_level = request.POST.get('battery_level', None)
+    motion = request.POST.get('motion', None)
 
     if name is None:
         log = Logs(severity='ERROR', message='Sensor name not found')
@@ -244,6 +242,17 @@ def receive_motion(request):
         log = Logs(severity='ERROR', message='Sensor not registered')
         log.save()
         return HttpResponse(f"error|Sensor not registered|", 400)
+
+    if motion is None:
+        log = Logs(severity='ERROR', message='Motion data not found')
+        log.save()
+        return HttpResponse(f"error|Motion data not found|", 400)
+
+    if motion == 'false':
+        led_light = False
+        log = Logs(severity='INFO', message=f'No motion detected for 5 minutes from {name}')
+        log.save()
+        return HttpResponse(f"success|No motion detected|{sensor.delay}")
 
     detection_result = capture_and_detect_humans()
     if detection_result['status'] == 'error':
@@ -387,8 +396,10 @@ def send_led_signal(request):
 
     if led_light != None:
         if led_light == True:
+            led_light = None
             return HttpResponse(f"success|HIGH|{sensor.delay}")
         else:
+            led_light = None
             return HttpResponse(f"success|LOW|{sensor.delay}")
     else:
         return HttpResponse(f"error|No LED data available|{sensor.delay}", 400)
