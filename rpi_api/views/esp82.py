@@ -406,7 +406,7 @@ def send_led_signal(request):
     if (timezone.now() - image_data.timestamp).total_seconds() > 300:
         return HttpResponse(f"error|LOW|{sensor.delay}", 400)
     
-    if image_data.detected_humans < 1:
+    if image_data.detected_humans <= 0:
         return HttpResponse(f"error|LOW|{sensor.delay}", 400)
     
     return HttpResponse(f"success|HIGH|{sensor.delay}")
