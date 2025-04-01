@@ -213,6 +213,11 @@ def receive_motion(request):
     """
     This view is used to receive PIR sensor data from ESP8266.
     """
+
+    global led_delay_start
+    global led_light
+    global last_motion_detected
+
     if request.method != 'POST':
         log = Logs(severity='WARNING', message='Invalid request method from Motion Sensor')
         log.save()
@@ -252,7 +257,7 @@ def receive_motion(request):
         led_light = False
         log = Logs(severity='INFO', message=f'No motion detected for 5 minutes from {name}')
         log.save()
-        return HttpResponse(f"success|No motion detected|{sensor.delay}")
+        return HttpResponse(f"success|No motion detected for 5 minutes|{sensor.delay}")
 
     detection_result = capture_and_detect_humans()
     if detection_result['status'] == 'error':
@@ -360,6 +365,10 @@ def send_led_signal(request):
     """
     This view is used to send LED signal to ESP8266.
     """
+
+    global led_delay_start
+    global led_light
+    global last_motion_detected
 
     if request.method != 'POST':
         log = Logs(severity='WARNING', message='Invalid request method from LED Sender')
