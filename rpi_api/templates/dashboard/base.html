@@ -34,18 +34,17 @@
                                 <p class="font-medium">Logout</p>
                             </a>
                         </li>
-                        
                     </ul>
 				</nav>
 			</div>
 			<!-- Main Content -->
 			<div class="flex-1">
 				<header class="flex p-4 border-b lg:space-x-0 space-x-4 bg-white">
-					<button id="openSidebar" class="text-gray-500 hover:text-gray-800 lg:hidden">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
-                        </svg>                          
-                    </button>
+					<button id="openSidebar" class="text-gray-500 hover:text-gray-800 lg:hidden block">
+						<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+							<path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+						</svg>                          
+					</button>
                     <h4 class="text-xl font-medium">Hello, {{ request.user.username }}</h4>
 				</header>
 				<main class="p-4">
@@ -53,7 +52,21 @@
 				</main>
 			</div>
 		</div>
-    
+		<script>
+			const openSidebarButton = document.getElementById('openSidebar');
+			const sidebar = document.getElementById('sidebar');
+			const overlay = document.getElementById('overlay');
+
+			openSidebarButton.addEventListener('click', function() {
+				sidebar.classList.toggle('-translate-x-full');
+				overlay.classList.toggle('hidden');
+			});
+
+			overlay.addEventListener('click', function() {
+				sidebar.classList.add('-translate-x-full');
+				overlay.classList.add('hidden');
+			});
+		</script>
         {% block javascript %}{% endblock %}
 	</body>
 </html>
