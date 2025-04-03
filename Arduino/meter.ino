@@ -43,7 +43,7 @@ int initial_connection(){
     SerialLogging(2, "Initializing connection to server...");
     http.begin(client, INIT_URL);
     http.addHeader("Content-Type", "application/x-www-form-urlencoded");
-    String post_data = "name=" + String(SENSOR_NAME) + "&battery_level=100&sensor_type=motion";
+    String post_data = "name=" + String(SENSOR_NAME) + "&battery_level=100&sensor_type=meter";
     
     int http_response_code = http.POST(post_data);
     
