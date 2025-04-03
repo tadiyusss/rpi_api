@@ -9,6 +9,7 @@ from rpi_api.models import Image, Logs, Temperature, RegisteredSensor, Power
 from django.shortcuts import get_object_or_404
 import csv
 from utils.ir import IR
+from utils.storage_manager import StorageManager
 
 def login(request):
     form = LoginForm()
@@ -44,13 +45,21 @@ def manage_settings(request):
 
 @login_required(login_url='/')
 def dashboard(request):
-    
+    storage = StorageManager.get_storage_in_gb()
+    used = storage['used']
+    total = storage['total']
+    percentage_usage = (used / total) * 100
     context = {
         'images': Image.objects.all().order_by('-timestamp'),
         'logs': Logs.objects.all().order_by('-timestamp'),
         'temperatures': Temperature.objects.all().order_by('-timestamp'),
         'registered_sensors': RegisteredSensor.objects.all().order_by('-last_seen'),
-        'power_meter': Power.objects.all().order_by('-timestamp')
+        'power_meter': Power.objects.all().order_by('-timestamp'),
+        'storage_used': used,
+        'storage_total': total,
+        'storage_free': storage['free'],
+        'storage_percentage': percentage_usage,
+
     }
     return render(request, 'dashboard/home.html', context)
 
