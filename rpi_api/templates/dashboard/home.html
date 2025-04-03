@@ -114,6 +114,7 @@
     <table class="w-full">
         <thead>
             <tr>
+                <th class="font-medium text-sm text-gray-500">Name</th>                
                 <th class="font-medium text-sm text-gray-500">Voltage</th>
                 <th class="font-medium text-sm text-gray-500">Current</th>
                 <th class="font-medium text-sm text-gray-500">Power</th>
@@ -127,6 +128,7 @@
             {% if power_meter|length > 0 %}
                 {% for reading in power_meter %}
                 <tr class="text-center">
+                    <td class="py-2 border-t">{{reading.sensor_name}}</td>
                     <td class="py-2 border-t">{{reading.voltage}}V</td>
                     <td class="py-2 border-t">{{reading.current}}A</td>
                     <td class="py-2 border-t">{{reading.power}}W</td>
@@ -138,7 +140,7 @@
                 {% endfor %}
             {% else %}
                 <tr>
-                    <td class="py-2 text-gray-600 border-t text-center" colspan="7">No power meter data available.</td>
+                    <td class="py-2 text-gray-600 border-t text-center" colspan="8">No power meter data available.</td>
                 </tr>
             {% endif %}
         </tbody>
