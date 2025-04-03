@@ -287,13 +287,13 @@ def receive_motion(request):
     if detection_result['data']['human_count'] == 0:
         if led_delay_start is None:
             led_delay_start = timezone.now()
-        elif (timezone.now() - led_delay_start).total_seconds() > 5:
+        elif (timezone.now() - led_delay_start).total_seconds() > 300:
             led_delay_start = None
-            ir_send = IRSend(name='SET_25')
+            ir_send = IRSend(name='SET_24')
             ir_send.save()
-    elif detection_result['data']['human_count'] < 10:
-        if latest_temperature.temperature > 25.0 and last_ir_send.name != 'SET_25':
-            ir_send = IRSend(name='SET_25')
+    elif detection_result['data']['human_count'] < 5:
+        if latest_temperature.temperature > 24.0 and last_ir_send.name != 'SET_24':
+            ir_send = IRSend(name='SET_24')
             ir_send.save()
     elif detection_result['data']['human_count'] < 20 and last_ir_send.name != 'SET_22':
         if latest_temperature.temperature > 22.0:
@@ -405,7 +405,7 @@ def send_led_signal(request):
     
     if (timezone.now() - image_data.timestamp).total_seconds() > 1200:
         return HttpResponse(f"error|LOW|{sensor.delay}", 400)
-    
+
     if image_data.detected_humans <= 0:
         return HttpResponse(f"error|LOW|{sensor.delay}", 400)
     
