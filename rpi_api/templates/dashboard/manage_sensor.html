@@ -101,6 +101,7 @@
         <table class="w-full">
             <thead>
                 <tr>
+                    <th class="font-medium text-sm text-gray-500">Name</th>
                     <th class="font-medium text-sm text-gray-500">Voltage</th>
                     <th class="font-medium text-sm text-gray-500">Current</th>
                     <th class="font-medium text-sm text-gray-500">Power</th>
@@ -114,6 +115,7 @@
                 {% if logs|length > 0 %}
                     {% for reading in logs %}
                     <tr class="text-center">
+                        <td class="py-2 border-t">{{reading.sensor_name}}</td>
                         <td class="py-2 border-t">{{reading.voltage}}V</td>
                         <td class="py-2 border-t">{{reading.current}}A</td>
                         <td class="py-2 border-t">{{reading.power}}W</td>
