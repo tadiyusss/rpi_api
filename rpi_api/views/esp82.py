@@ -199,6 +199,15 @@ def receive_temperature(request):
     sensor.last_seen = timezone.now()
     sensor.save()
 
+
+    last_ir_sent = IRSend.objects.all().order_by('-timestamp').first()
+    if timezone.now().hour >= 21 and timezone.now().hour <= 7 and last_ir_sent != 'POWER_OFF': # if time is between 21:00 and 07:00
+        ir_send = IRSend(name='POWER_OFF')
+        ir_send.save()
+        logs = Logs(severity='INFO', message='Power OFF command sent to IR Sender')
+        logs.save()
+        return HttpResponse(f"success|Temperature data received|{sensor.delay}")
+
     log = Logs(severity='SUCCESS', message=f'Received {temperature}°C from {name}')
     log.save()
 
@@ -284,26 +293,29 @@ def receive_motion(request):
     latest_temperature = Temperature.objects.all().order_by('-timestamp').first()
     last_ir_send = IRSend.objects.all().order_by('-timestamp').first()
 
-    if detection_result['data']['human_count'] == 0:
-        if led_delay_start is None:
-            led_delay_start = timezone.now()
-        elif (timezone.now() - led_delay_start).total_seconds() > 300:
-            led_delay_start = None
-            ir_send = IRSend(name='SET_24')
-            ir_send.save()
-    elif detection_result['data']['human_count'] < 5:
-        if latest_temperature.temperature > 24.0 and last_ir_send.name != 'SET_24':
-            ir_send = IRSend(name='SET_24')
-            ir_send.save()
-    elif detection_result['data']['human_count'] < 20 and last_ir_send.name != 'SET_22':
-        if latest_temperature.temperature > 22.0:
-            ir_send = IRSend(name='SET_22')
-            ir_send.save()
-    elif detection_result['data']['human_count'] >= 20 and last_ir_send.name != 'SET_19':
-        if latest_temperature.temperature > 19.0:
-            ir_send = IRSend(name='SET_19')
-            ir_send.save()
-    return HttpResponse(f"success|Motion data received|{sensor.delay}")
+    if timezone.now().hour >= 7 and timezone.now().hour < 21:
+        if detection_result['data']['human_count'] == 0:
+            if led_delay_start is None:
+                led_delay_start = timezone.now()
+            elif (timezone.now() - led_delay_start).total_seconds() > 300:
+                led_delay_start = None
+                ir_send = IRSend(name='SET_24')
+                ir_send.save()
+        elif detection_result['data']['human_count'] < 5:
+            if latest_temperature.temperature > 24.0 and last_ir_send.name != 'SET_24':
+                ir_send = IRSend(name='SET_24')
+                ir_send.save()
+        elif detection_result['data']['human_count'] < 20 and last_ir_send.name != 'SET_22':
+            if latest_temperature.temperature > 22.0:
+                ir_send = IRSend(name='SET_22')
+                ir_send.save()
+        elif detection_result['data']['human_count'] >= 20 and last_ir_send.name != 'SET_19':
+            if latest_temperature.temperature > 19.0:
+                ir_send = IRSend(name='SET_19')
+                ir_send.save()
+        return HttpResponse(f"success|Motion data received|{sensor.delay}")
+    else:
+        return HttpResponse(f"error|Motion data received but no action was sent due to time restrictions|{sensor.delay}")
 
 
 @csrf_exempt
