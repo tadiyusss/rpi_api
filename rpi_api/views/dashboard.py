@@ -10,6 +10,7 @@ from django.shortcuts import get_object_or_404
 import csv
 from utils.ir import IR
 from utils.storage_manager import StorageManager
+from django.utils.timezone import localtime
 
 def login(request):
     form = LoginForm()
@@ -102,7 +103,7 @@ def export_temperatures(request):
     writer.writerow(['Temperature', 'Timestamp', 'Sensor Name'])
 
     for temperature in Temperature.objects.all().order_by('-timestamp'):
-        writer.writerow([temperature.temperature, temperature.timestamp, temperature.sensor_name])
+        writer.writerow([temperature.temperature, localtime(temperature.timestamp).strftime('%Y-%m-%d %H:%M:%S'), temperature.sensor_name])
 
     return response
 
@@ -114,7 +115,7 @@ def export_power_meter(request):
     writer.writerow(['Voltage', 'Current', 'Power', 'Energy', 'Frequency', 'Power Factor', 'Timestamp', 'Sensor Name'])
 
     for power in Power.objects.all().order_by('-timestamp'):
-        writer.writerow([power.voltage, power.current, power.power, power.energy, power.frequency, power.power_factor, power.timestamp, power.sensor_name])
+        writer.writerow([power.voltage, power.current, power.power, power.energy, power.frequency, power.power_factor, localtime(power.timestamp).strftime('%Y-%m-%d %H:%M:%S'), power.sensor_name])
 
     return response
 
@@ -126,7 +127,7 @@ def export_images(request):
     writer.writerow(['Image Name', 'Detected Humans', 'Processing Time', 'Timestamp', 'Sensor Name'])
 
     for image in Image.objects.all().order_by('-timestamp'):
-        writer.writerow([image.image_name, image.detected_humans, image.processing_time, image.timestamp, image.sensor_name])
+        writer.writerow([image.image_name, image.detected_humans, image.processing_time, localtime(image.timestamp).strftime('%Y-%m-%d %H:%M:%S'), image.sensor_name])
 
     return response
 
