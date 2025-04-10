@@ -261,8 +261,10 @@ def receive_motion(request):
         log = Logs(severity='ERROR', message='Motion data not found')
         log.save()
         return HttpResponse(f"error|Motion data not found|", 400)
+    
+    last_motion_detected = Image.objects.all().order_by('-timestamp').first()
 
-    if motion == 'false':
+    if motion == 'false' and last_motion_detected and (timezone.now() - last_motion_detected.timestamp).total_seconds() > 300:
         led_light = False
         log = Logs(severity='INFO', message=f'No motion detected for 5 minutes from {name}')
         log.save()
