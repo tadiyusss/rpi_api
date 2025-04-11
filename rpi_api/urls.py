@@ -48,6 +48,7 @@ urlpatterns = [
     path('export/temperatures/', dashboard.export_temperatures, name='export_temperatures'),
     path('export/images/', dashboard.export_images, name='export_images'),
     path('export/meter/', dashboard.export_power_meter, name='export_meter'),
+    path('export/ir/', dashboard.export_ir, name='export_ir'),
     path('logout/', dashboard.logout, name='logout'),
 ]
 

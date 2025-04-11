@@ -204,6 +204,38 @@
                 </div>
             </div>
         </div>
+        
+        <div class="w-full border mt-4 rounded bg-white max-h-96 overflow-y-auto">
+            <div class="w-full p-2 border-b bg-gray-50">
+                <h4 class="text-gray-500 font-medium text-sm">CPU Usage</h4>
+            </div>
+            <div class="p-4">
+                <p class="text-gray-500 text-sm">CPU Temperature</p>
+                <div class="w-full bg-gray-200 rounded-full h-4 overflow-hidden my-2">
+                    <div class="bg-blue-500 h-full text-xs font-medium text-white text-center p-0.5 leading-none w-[{{cpu_temperature|floatformat:0}}%]">{{cpu_temperature|floatformat:0}}%</div>
+                </div>
+                <div class="w-full flex justify-between">
+                    <p class="text-gray-500 text-xs">0 C</p>
+                    <p class="text-gray-500 text-xs">100 C</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="w-full border mt-4 rounded bg-white max-h-96 overflow-y-auto">
+            <div class="w-full p-2 border-b bg-gray-50">
+                <h4 class="text-gray-500 font-medium text-sm">CPU Usage</h4>
+            </div>
+            <div class="p-4">
+                <p class="text-gray-500 text-sm">CPU Usage</p>
+                <div class="w-full bg-gray-200 rounded-full h-4 overflow-hidden my-2">
+                    <div class="bg-blue-500 h-full text-xs font-medium text-white text-center p-0.5 leading-none w-[{{cpu_usage|floatformat:0}}%]">{{cpu_usage|floatformat:0}}%</div>
+                </div>
+                <div class="w-full flex justify-between">
+                    <p class="text-gray-500 text-xs">0 %</p>
+                    <p class="text-gray-500 text-xs">100 %</p>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 

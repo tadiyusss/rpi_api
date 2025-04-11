@@ -133,6 +133,37 @@
             </tbody>
         </table>
     </div>
+    {% elif sensor_type == 'remote' %}
+    <div class="w-full border rounded bg-white max-h-96 overflow-y-auto">
+        <div class="w-full p-2 border-b bg-gray-50 flex items-center justify-between">
+            <h4 class="text-gray-500 font-medium text-sm">IR Remote</h4>
+            <a href="{% url 'export_ir' %}" class="px-4 py-1 rounded bg-indigo-600 hover:bg-indigo-700 ease duration-200 text-white text-sm">Export</a>
+        </div>
+        <table class="w-full">
+            <thead>
+                <tr>
+                    <th class="font-medium text-sm text-gray-500">Command</th>
+                    <th class="font-medium text-sm text-gray-500">Sent</th>
+                    <th class="font-medium text-sm text-gray-500">Timestamp</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% if logs|length > 0 %}
+                    {% for ir_command in logs %}
+                    <tr class="text-center">
+                        <td class="py-2 border-t">{{ ir_command.name }}</td>
+                        <td class="py-2 border-t">{{ ir_command.received }}</td>
+                        <td class="py-2 border-t">{{ ir_command.timestamp }}</td>
+                    </tr>
+                    {% endfor %}
+                {% else %}
+                    <tr>
+                        <td class="py-2 text-gray-600 border-t text-center" colspan="4">No power meter data available.</td>
+                    </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
     {% endif %}
 </div>
 

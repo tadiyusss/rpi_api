@@ -5,11 +5,12 @@ from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login as auth_login, logout as auth_logout
 from django.contrib import messages
 from rpi_api.forms import LoginForm, ManageSensor
-from rpi_api.models import Image, Logs, Temperature, RegisteredSensor, Power
+from rpi_api.models import Image, Logs, Temperature, RegisteredSensor, Power, IRSend
 from django.shortcuts import get_object_or_404
 import csv
 from utils.ir import IR
 from utils.storage_manager import StorageManager
+from utils.cpu_manager import CPUInfo
 from django.utils.timezone import localtime
 
 def login(request):
@@ -46,6 +47,7 @@ def manage_settings(request):
 
 @login_required(login_url='/')
 def dashboard(request):
+    cpu_info = CPUInfo()
     storage = StorageManager.get_storage_in_gb()
     used = storage['used']
     total = storage['total']
@@ -60,7 +62,8 @@ def dashboard(request):
         'storage_total': total,
         'storage_free': storage['free'],
         'storage_percentage': percentage_usage,
-
+        'cpu_usage': cpu_info.get_gpu_usage(),
+        'cpu_temperature': cpu_info.get_cpu_temperature() or 0
     }
     return render(request, 'dashboard/home.html', context)
 
@@ -75,6 +78,8 @@ def manage_sensor(request, sensor_name):
         logs = Image.objects.filter(sensor_name=sensor_name).order_by('-timestamp')
     elif sensor.sensor_type == 'meter':
         logs = Power.objects.filter(sensor_name=sensor_name).order_by('-timestamp')
+    elif sensor.sensor_type == 'remote':
+        logs = IRSend.objects.order_by('-timestamp')
     else:
         logs = []
     if request.method == 'POST':
@@ -94,6 +99,17 @@ def manage_sensor(request, sensor_name):
     }
     return render(request, 'dashboard/manage_sensor.html', context)
 
+def export_ir(request):
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="ir_logs.csv"'
+
+    writer = csv.writer(response)
+    writer.writerow(['IR Command', 'Timestamp', 'Received'])
+
+    for ir in IRSend.objects.all().order_by('-timestamp'):
+        writer.writerow([ir.name, localtime(ir.timestamp).strftime('%Y-%m-%d %H:%M:%S'), ir.received])
+
+    return response
 
 def export_temperatures(request):
     response = HttpResponse(content_type='text/csv')

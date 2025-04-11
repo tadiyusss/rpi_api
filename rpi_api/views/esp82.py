@@ -205,7 +205,7 @@ def receive_temperature(request):
     
     last_ir_sent = IRSend.objects.all().order_by('-timestamp').first()
 
-    if time_in_hour not in allowed_ir_send_hours and last_ir_sent != 'POWER_ON': 
+    if time_in_hour not in allowed_ir_send_hours and last_ir_sent.name != 'POWER_ON': 
         ir_send = IRSend(name='POWER_ON')
         ir_send.save()
         logs = Logs(severity='INFO', message='Power OFF command sent to IR Sender')
