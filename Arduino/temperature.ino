@@ -123,7 +123,7 @@ void setup() {
     SerialLogging(1, "Initialization complete!");
 }
 
-void sendTemperature(float celsiusTemp) {
+void sendTemperature(float celsiusTemp, float humidity) {
     if (WiFi.status() != WL_CONNECTED) {
         connectWiFi();  // Reconnect if disconnected
     }
@@ -135,7 +135,7 @@ void sendTemperature(float celsiusTemp) {
     http.begin(client, SERVER_URL);
     http.addHeader("Content-Type", "application/x-www-form-urlencoded");
 
-    String postData = "temperature=" + String(celsiusTemp) + "&name=" + String(SENSOR_NAME) + "&battery_level=100";
+    String postData = "temperature=" + String(celsiusTemp) + "&name=" + String(SENSOR_NAME) + "&battery_level=100&humidity=" + String(humidity);
 
     int httpResponseCode = http.POST(postData);
     if (httpResponseCode > 0) {
@@ -179,9 +179,13 @@ void loop() {
 
     // Read humidity data
     Wire.requestFrom(si7021Addr, 2);
+    float humidity = 0.0;
     if (Wire.available() == 2) {
         data[0] = Wire.read();
         data[1] = Wire.read();
+        // Convert humidity data
+        float rawHumidity = ((data[0] * 256.0) + data[1]);
+        humidity = ((125.0 * rawHumidity) / 65536.0) - 6.0;
     }
 
     // Request temperature measurement
@@ -192,17 +196,18 @@ void loop() {
 
     // Read temperature data
     Wire.requestFrom(si7021Addr, 2);
+    float celsiusTemp = 0.0;
     if (Wire.available() == 2) {
         data[0] = Wire.read();
         data[1] = Wire.read();
+        // Convert temperature data
+        float temp = ((data[0] * 256.0) + data[1]);
+        celsiusTemp = ((175.72 * temp) / 65536.0) - 46.85;
     }
-
-    // Convert temperature data
-    float temp = ((data[0] * 256.0) + data[1]);
-    float celsiusTemp = ((175.72 * temp) / 65536.0) - 46.85;
 
     // Print to Serial
     SerialLogging(4, "Temperature: " + String(celsiusTemp) + " C");
+    SerialLogging(4, "Humidity: " + String(humidity) + " %");
 
     // Send the temperature data to the server
     sendTemperature(celsiusTemp);

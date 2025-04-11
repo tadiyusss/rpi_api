@@ -171,6 +171,7 @@ def receive_temperature(request):
         }, status=405)
     
     temperature = request.POST.get('temperature', None)
+    humidity = request.POST.get('humidity', None)
     name = request.POST.get('name', None)
     battery_level = request.POST.get('battery_level', None)
 
@@ -190,6 +191,11 @@ def receive_temperature(request):
         
         return HttpResponse(f"error|Temperature data not found|", 400)
     
+    if humidity is None:
+        log = Logs(severity='ERROR', message='Humidity data not found')
+        log.save()
+        return HttpResponse(f"error|Humidity data not found|", 400)
+
     sensor = RegisteredSensor.objects.get(name=name)
 
     if sensor is None:
