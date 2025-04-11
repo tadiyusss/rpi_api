@@ -10,11 +10,13 @@ from rpi_api.models import Image, Logs, Temperature, RegisteredSensor, Power, IR
 from utils.camera import capture_and_detect_humans
 from django.utils import timezone
 from utils.ir import IR
+import datetime
 
 
 last_motion_detected = None
 led_delay_start = None
 led_light = None
+allowed_ir_send_hours = list(range(7, 21)) 
 
 @csrf_exempt
 def initial_connection(request):
@@ -199,9 +201,11 @@ def receive_temperature(request):
     sensor.last_seen = timezone.now()
     sensor.save()
 
-
+    time_in_hour = datetime.datetime.now().hour
+    
     last_ir_sent = IRSend.objects.all().order_by('-timestamp').first()
-    if timezone.now().hour >= 21 and timezone.now().hour <= 7 and last_ir_sent != 'POWER_ON': # if time is between 21:00 and 07:00
+
+    if time_in_hour not in allowed_ir_send_hours and last_ir_sent != 'POWER_ON': 
         ir_send = IRSend(name='POWER_ON')
         ir_send.save()
         logs = Logs(severity='INFO', message='Power OFF command sent to IR Sender')
@@ -294,13 +298,11 @@ def receive_motion(request):
 
     latest_temperature = Temperature.objects.all().order_by('-timestamp').first()
     last_ir_send = IRSend.objects.all().order_by('-timestamp').first()
+    time_in_hour = datetime.datetime.now().hour
 
-    if timezone.now().hour >= 7 and timezone.now().hour < 21:
+    if time_in_hour in allowed_ir_send_hours:
         if detection_result['data']['human_count'] == 0:
-            if led_delay_start is None:
-                led_delay_start = timezone.now()
-            elif (timezone.now() - led_delay_start).total_seconds() > 300:
-                led_delay_start = None
+            if last_ir_send.name != 'SET_24':
                 ir_send = IRSend(name='SET_24')
                 ir_send.save()
         elif detection_result['data']['human_count'] < 5:
@@ -317,6 +319,8 @@ def receive_motion(request):
                 ir_send.save()
         return HttpResponse(f"success|Motion data received|{sensor.delay}")
     else:
+        log = Logs(severity='INFO', message=f'Motion data received but no action was sent due to time restrictions')
+        log.save()
         return HttpResponse(f"error|Motion data received but no action was sent due to time restrictions|{sensor.delay}")
 
 
