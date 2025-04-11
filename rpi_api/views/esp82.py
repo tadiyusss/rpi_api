@@ -188,7 +188,6 @@ def receive_temperature(request):
     if temperature is None:
         log = Logs(severity='ERROR', message='Temperature data not found')
         log.save()
-        
         return HttpResponse(f"error|Temperature data not found|", 400)
     
     if humidity is None:
@@ -221,7 +220,7 @@ def receive_temperature(request):
     log = Logs(severity='SUCCESS', message=f'Received {temperature}°C from {name}')
     log.save()
 
-    temperature = Temperature(temperature=temperature, sensor_name=name)
+    temperature = Temperature(temperature=temperature, sensor_name=name, humidity=humidity)
     temperature.save()
 
     return HttpResponse(f"success|Temperature data received|{sensor.delay}")

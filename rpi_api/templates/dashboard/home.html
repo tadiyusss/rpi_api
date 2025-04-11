@@ -48,7 +48,7 @@
             <thead>
                 <tr>
                     <th class="font-medium text-sm text-gray-500">Celsius</th>
-                    <th class="font-medium text-sm text-gray-500">Fahrenheit</th>
+                    <th class="font-medium text-sm text-gray-500">Humidity</th>
                     <th class="font-medium text-sm text-gray-500">Timestamp</th>
                 </tr>
             </thead>
@@ -57,7 +57,7 @@
                     {% for temperature in temperatures %}
                     <tr class="text-center">
                         <td class="py-2 border-t">{{ temperature.temperature }} C</td>
-                        <td class="py-2 border-t">{{ temperature.fahrenheit }} F</td>
+                        <td class="py-2 border-t">{{ temperature.humidity }} %</td>
                         <td class="py-2 border-t">{{ temperature.timestamp }}</td>
                     </tr>
                     {% endfor %}

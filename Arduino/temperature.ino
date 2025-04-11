@@ -210,7 +210,7 @@ void loop() {
     SerialLogging(4, "Humidity: " + String(humidity) + " %");
 
     // Send the temperature data to the server
-    sendTemperature(celsiusTemp);
+    sendTemperature(celsiusTemp, humidity);
 
     delay(DELAY); 
 }

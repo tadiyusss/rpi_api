@@ -50,6 +50,7 @@ class Temperature(models.Model):
     Database model for storing temperature readings from ESP8266.
     """
     temperature = models.FloatField()
+    humidity = models.FloatField()
     timestamp = models.DateTimeField(auto_now_add=True)
     sensor_name = models.CharField(max_length=255, blank=True)    
 

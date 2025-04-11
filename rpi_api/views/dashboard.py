@@ -116,10 +116,10 @@ def export_temperatures(request):
     response['Content-Disposition'] = 'attachment; filename="temperature_readings.csv"'
 
     writer = csv.writer(response)
-    writer.writerow(['Temperature', 'Timestamp', 'Sensor Name'])
+    writer.writerow(['Celsius', 'Humidity' 'Timestamp', 'Sensor Name'])
 
     for temperature in Temperature.objects.all().order_by('-timestamp'):
-        writer.writerow([temperature.temperature, localtime(temperature.timestamp).strftime('%Y-%m-%d %H:%M:%S'), temperature.sensor_name])
+        writer.writerow([temperature.temperature, temperature.humidity, localtime(temperature.timestamp).strftime('%Y-%m-%d %H:%M:%S'), temperature.sensor_name])
 
     return response
 
