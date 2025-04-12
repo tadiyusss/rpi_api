@@ -301,32 +301,30 @@ def receive_motion(request):
     sensor.last_seen = timezone.now()   
     sensor.save()
 
-    latest_temperature = Temperature.objects.all().order_by('-timestamp').first()
+    # check if IRSend have a row
+
+    if IRSend.objects.all().exists() == False:
+        ir_send = IRSend(name='Initial', received=True)
+        ir_send.save()
+
     last_ir_send = IRSend.objects.all().order_by('-timestamp').first()
     time_in_hour = datetime.datetime.now().hour
 
-    if time_in_hour in allowed_ir_send_hours:
-        if detection_result['data']['human_count'] == 0:
-            if last_ir_send.name != 'SET_24':
-                ir_send = IRSend(name='SET_24')
-                ir_send.save()
-        elif detection_result['data']['human_count'] < 5:
-            if latest_temperature.temperature > 24.0 and last_ir_send.name != 'SET_24':
-                ir_send = IRSend(name='SET_24')
-                ir_send.save()
-        elif detection_result['data']['human_count'] < 20 and last_ir_send.name != 'SET_22':
-            if latest_temperature.temperature > 22.0:
-                ir_send = IRSend(name='SET_22')
-                ir_send.save()
-        elif detection_result['data']['human_count'] >= 20 and last_ir_send.name != 'SET_19':
-            if latest_temperature.temperature > 19.0:
-                ir_send = IRSend(name='SET_19')
-                ir_send.save()
-        return HttpResponse(f"success|Motion data received|{sensor.delay}")
-    else:
-        log = Logs(severity='INFO', message=f'Motion data received but no action was sent due to time restrictions')
+    if time_in_hour not in allowed_ir_send_hours:
+        log = Logs(severity='SUCCESS', message=f'Motion data received but no action was sent due to time restrictions')
         log.save()
         return HttpResponse(f"error|Motion data received but no action was sent due to time restrictions|{sensor.delay}")
+    if detection_result['data']['human_count'] in list(range(0,5)) and last_ir_send.name != 'SET_24':
+        ir_send = IRSend(name='SET_24')
+        ir_send.save()
+    elif detection_result['data']['human_count'] in list(range(5,21)) and last_ir_send.name != 'SET_22':
+        ir_send = IRSend(name='SET_22')
+        ir_send.save()
+    elif detection_result['data']['human_count'] >= 20 and last_ir_send.name != 'SET_19':
+        ir_send = IRSend(name='SET_19')
+        ir_send.save()
+    return HttpResponse(f"success|Motion data received|{sensor.delay}")
+        
 
 
 @csrf_exempt
